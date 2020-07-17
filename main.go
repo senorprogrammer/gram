@@ -51,11 +51,8 @@ func main() {
 func findAnagrams(inputWord string, wordList []string) []string {
 	anagrams := []string{}
 
-	inputRunes := wordToRuneList(inputWord)
-	inputLen := len(inputRunes)
-
-	if inputLen <= 1 {
-		// A one-letter word, or a no-letter string, cannot have any anagrams
+	if len(inputWord) <= 1 {
+		// A one-letter string, or a no-letter string, cannot have any anagrams
 		return anagrams
 	}
 
@@ -63,11 +60,11 @@ func findAnagrams(inputWord string, wordList []string) []string {
 	// The following conditions exclude a word from being an anagram:
 	//	* if the word is a different length
 	//  * if the word is the same word as the input word
-	//  * if the word contains a letter the input word does not
+	//  * if the word contains a letter that the input word does not
 	for _, dictWord := range wordList {
 		// Check to see if the word is a different length
 		dictWordLen := len(dictWord)
-		if dictWordLen != inputLen {
+		if dictWordLen != len(inputWord) {
 			continue
 		}
 
@@ -76,13 +73,9 @@ func findAnagrams(inputWord string, wordList []string) []string {
 			continue
 		}
 
-		// Create a rune list of this same-sized word so it can be compared against
-		// the input rune list
-		dictRunes := wordToRuneList(dictWord)
-
-		// Compare the two rune lists to see if they have any differing letters
+		// Compare the two words to see if they have any differing letters
 		// If any letters are different, they cannot be anagrams
-		areTheSame := compareForEquality(inputRunes, dictRunes)
+		areTheSame := compareForEquality(inputWord, dictWord)
 
 		if areTheSame {
 			anagrams = append(anagrams, dictWord)
@@ -111,27 +104,24 @@ func buildWordList(dictPath string) ([]string, error) {
 	return words, nil
 }
 
-// wordToRuneList takes a given string and returns back a set of all the
-// runes in that word
-func wordToRuneList(srcWord string) []rune {
-	return []rune(srcWord)
-}
-
-// compareForEquality checks whether or not two rune slices are exactly the same
-func compareForEquality(a, b []rune) bool {
-	sort.Sort(RuneSlice(a))
-	sort.Sort(RuneSlice(b))
-
+// compareForEquality checks whether or not two strings, when sorted, are exactly the same
+func compareForEquality(a, b string) bool {
 	if len(a) != len(b) {
 		// If they don't have the same length, they cannot be the same
 		return false
 	}
 
-	for idx, aLetter := range a {
-		bLetter := b[idx]
+	aSliced := strings.Split(a, "")
+	bSliced := strings.Split(b, "")
+
+	sort.Sort(StringSlice(aSliced))
+	sort.Sort(StringSlice(bSliced))
+
+	for idx, aLetter := range aSliced {
+		bLetter := bSliced[idx]
 
 		if aLetter != bLetter {
-			// If positionally a letter differs, they cannot be the same
+			// If any letter differs positionally, they cannot be the same
 			return false
 		}
 	}
