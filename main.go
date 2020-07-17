@@ -21,11 +21,7 @@ func init() {
 	flag.StringVar(&inputWord, "w", "", "the word to anagram (short hand)")
 }
 
-func main() {
-	flag.Parse()
-
-	anagrams := anagrammer.Find(inputWord)
-
+func display(anagrams []string) {
 	if len(anagrams) == 0 {
 		fmt.Printf("'%s' has no anagrams\n", inputWord)
 	} else {
@@ -34,6 +30,15 @@ func main() {
 		fmt.Printf("Found %d anagrams for '%s':\n", len(anagrams), inputWord)
 		fmt.Println(output)
 	}
+}
+
+/* -------------------- Main -------------------- */
+
+func main() {
+	flag.Parse()
+
+	anagrams := anagrammer.Find(inputWord)
+	display(anagrams)
 
 	os.Exit(0)
 }

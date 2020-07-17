@@ -38,7 +38,7 @@ func scanForAnagrams(dictPath string, inputWord string) ([]string, error) {
 	for scanner.Scan() {
 		word := scanner.Text()
 
-		if wordsAreAnagrams(inputWord, word) {
+		if wordsAreEqual(inputWord, word) {
 			anagrams = append(anagrams, word)
 		}
 	}
@@ -47,10 +47,10 @@ func scanForAnagrams(dictPath string, inputWord string) ([]string, error) {
 }
 
 // wordsAreAnagrams checks whether or not two strings, when sorted, are exactly the same
-func wordsAreAnagrams(wordA, wordB string) bool {
+func wordsAreEqual(wordA, wordB string) bool {
 	if len(wordA) != len(wordB) {
 		// If the word we're scanning is a different length than the input word,
-		// this word cannot be an anagram of the input word, so don't include it in the dict
+		// this word cannot be anagrams
 		return false
 	}
 
