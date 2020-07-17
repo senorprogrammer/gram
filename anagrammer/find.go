@@ -14,21 +14,19 @@ const (
 
 // Find takes an input word and returns a set of all the anagrams for that word
 func Find(inputWord string) []string {
-	wordList, err := buildWordList(dictionaryPath)
+	anagrams, err := findAnagrams(dictionaryPath, inputWord)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	anagrams := findAnagrams(inputWord, wordList)
 
 	return anagrams
 }
 
 /* -------------------- Unexported Functions -------------------- */
 
-// buildWordList uses the local dictionary to create an enumerable set of all known
+// findAnagrams uses the local dictionary to create an enumerable set of all known
 // words. This is used to check for anagrams
-func buildWordList(dictPath string) ([]string, error) {
+func findAnagrams(dictPath string, inputWord string) ([]string, error) {
 	words := []string{}
 
 	dict, err := os.Open(dictPath)
@@ -39,7 +37,22 @@ func buildWordList(dictPath string) ([]string, error) {
 	scanner := bufio.NewScanner(dict)
 	for scanner.Scan() {
 		word := scanner.Text()
-		words = append(words, word)
+
+		if len(word) != len(inputWord) {
+			// If the word we're scanning is a different length than the input word,
+			// this word cannot be an anagram of the input word, so don't include it in the dict
+			continue
+		}
+
+		if word == inputWord {
+			// If the word is the same word as the input word, it is not an anagram
+			continue
+		}
+
+		isAnagram := compareForEquality(inputWord, word)
+		if isAnagram {
+			words = append(words, word)
+		}
 	}
 
 	return words, nil
@@ -68,42 +81,4 @@ func compareForEquality(a, b string) bool {
 	}
 
 	return true
-}
-
-// findAnagrams finds anagrams for a given string
-func findAnagrams(inputWord string, wordList []string) []string {
-	anagrams := []string{}
-
-	if len(inputWord) <= 1 {
-		// A one-letter string, or a no-letter string, cannot have any anagrams
-		return anagrams
-	}
-
-	// Check every word in the word list to see if it's an anagram
-	// The following conditions exclude a word from being an anagram:
-	//	* if the word is a different length
-	//  * if the word is the same word as the input word
-	//  * if the word contains a letter that the input word does not
-	for _, dictWord := range wordList {
-		// Check to see if the word is a different length
-		dictWordLen := len(dictWord)
-		if dictWordLen != len(inputWord) {
-			continue
-		}
-
-		// The word itself is not an anagram of itself
-		if dictWord == inputWord {
-			continue
-		}
-
-		// Compare the two words to see if they have any differing letters
-		// If any letters are different, they cannot be anagrams
-		areTheSame := compareForEquality(inputWord, dictWord)
-
-		if areTheSame {
-			anagrams = append(anagrams, dictWord)
-		}
-	}
-
-	return anagrams
 }
