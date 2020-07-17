@@ -1,4 +1,4 @@
-package main
+package anagrammer
 
 // StringSlice aliases a slice of letters to make them sortable
 type StringSlice []string
